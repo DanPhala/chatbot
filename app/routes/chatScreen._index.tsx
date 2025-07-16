@@ -37,7 +37,7 @@ export default function ChatScreen() {
       setMessages(prev => prev.map(msg => 
         msg.isLoading ? {
           ...msg,
-          text: `Response to: ${message}`,
+          text: message,
           isLoading: false,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         } : msg
@@ -63,7 +63,7 @@ export default function ChatScreen() {
         </div>
       </div>
 
-      <div className="border-t bg-white p-4">
+      <div className="bg-white p-4">
         <ChatInputComponent 
           onSendMessage={handleSendMessage}
           isLoading={isLoading}
