@@ -14,37 +14,65 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSendMessage = useCallback(async (message: string, model: string, document?: string) => {
-    const userMessage: Message = {
+const handleSendMessage = useCallback(async (message: string, model: string, document?: string) => {
+  model = model || "gpt-4o-mini";
+  setIsLoading(true);
+
+  // Add user message
+  setMessages(prev => [
+    ...prev,
+    {
       id: `user-${Date.now()}`,
       text: message,
       isUser: true,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
-    setMessages(prev => [...prev, userMessage])
-
-    const loadingMessage: Message = {
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    },
+    {
       id: `loading-${Date.now()}`,
       text: '',
       isUser: false,
       timestamp: '',
-      isLoading: true
+      isLoading: true,
     }
-    setMessages(prev => [...prev, loadingMessage])
-    setIsLoading(true)
+  ]);
 
-    setTimeout(() => {
-      setMessages(prev => prev.map(msg => 
-        msg.isLoading ? {
-          ...msg,
-          text: message,
-          isLoading: false,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        } : msg
-      ))
-      setIsLoading(false)
-    }, 2000)
-  }, [])
+  try {
+    const response = await fetch("/api/llmService", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: message, model }),
+    });
+    const data = await response.json();
+
+    setMessages(prev =>
+      prev.map(msg =>
+        msg.isLoading
+          ? {
+              ...msg,
+              text: data.message,
+              isLoading: false,
+              timestamp: data.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isUser: data.isUser ?? false,
+            }
+          : msg
+      )
+    );
+  } catch (error) {
+    setMessages(prev =>
+      prev.map(msg =>
+        msg.isLoading
+          ? {
+              ...msg,
+              text: "Error getting response",
+              isLoading: false,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }
+          : msg
+      )
+    );
+  }
+  setIsLoading(false);
+}, []);
 
   return (
     <div className="flex flex-col h-screen">
