@@ -5,19 +5,20 @@ import { OpenAI } from "openai";
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
+const default_model = process.env.MODEL
+if (!default_model) {
+  throw new Error("MODEL environment variable is not set");
+}
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { prompt, model } = await request.json();
-
-  console.log("Received prompt:", prompt);
-  console.log("Using model:", model);
-
-  // Call OpenAI and get the completion
+  const { prompt } = await request.json();
+  
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model:default_model ,
     messages: [{ role: "user", content: prompt }],
   });
 
+  console.log("OpenAI response:", completion);
+  
   return json({
   message: completion.choices[0].message.content,
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),

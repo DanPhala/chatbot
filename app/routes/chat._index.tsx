@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, {useEffect, useState, useCallback } from 'react';
 import ChatInputComponent from '../components/ui/textArea';
 import ChatTextField from '../components/common/chatTextField';
 
@@ -14,11 +14,36 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-const handleSendMessage = useCallback(async (message: string, model: string, document?: string) => {
+  useEffect(() => {
+    fetch("/api/chat")
+      .then(res => res.json())
+      .then(data => {
+        if (data.chats) {
+          // Flatten user and bot messages for display
+          const loadedMessages: Message[] = [];
+          data.chats.forEach((chat: any, idx: number) => {
+            loadedMessages.push({
+              id: `user-${idx}`,
+              text: chat.user,
+              isUser: true,
+              timestamp: new Date(chat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            });
+            loadedMessages.push({
+              id: `bot-${idx}`,
+              text: chat.bot,
+              isUser: false,
+              timestamp: new Date(chat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            });
+          });
+          setMessages(loadedMessages);
+        }
+      });
+  }, []);
+
+  const handleSendMessage = useCallback(async (message: string, model: string, document?: string) => {
   model = model || "gpt-4o-mini";
   setIsLoading(true);
 
-  // Add user message
   setMessages(prev => [
     ...prev,
     {
@@ -43,6 +68,13 @@ const handleSendMessage = useCallback(async (message: string, model: string, doc
       body: JSON.stringify({ prompt: message, model }),
     });
     const data = await response.json();
+
+    // Save chat to MongoDB via API
+    await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: message, bot: data.message }),
+    });
 
     setMessages(prev =>
       prev.map(msg =>
@@ -73,6 +105,7 @@ const handleSendMessage = useCallback(async (message: string, model: string, doc
   }
   setIsLoading(false);
 }, []);
+
 
   return (
     <div className="flex flex-col h-screen">
