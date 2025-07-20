@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useCallback } from 'react';
 import ChatInputComponent from '../components/ui/textArea';
 import ChatTextField from '../components/common/chatTextField';
+import Header from '../components/ui/header';
 
 interface Message {
   id: string
@@ -19,7 +20,6 @@ export default function ChatScreen() {
       .then(res => res.json())
       .then(data => {
         if (data.chats) {
-          // Flatten user and bot messages for display
           const loadedMessages: Message[] = [];
           data.chats.forEach((chat: any, idx: number) => {
             loadedMessages.push({
@@ -69,7 +69,6 @@ export default function ChatScreen() {
     });
     const data = await response.json();
 
-    // Save chat to MongoDB via API
     await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -109,6 +108,7 @@ export default function ChatScreen() {
 
   return (
     <div className="flex flex-col h-screen">
+      <Header userName="John Doe" userEmail="john@example.com" /> {/* <-- Add Header here */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="w-full max-w-6xl mx-auto">
           {messages.map((message) => (
