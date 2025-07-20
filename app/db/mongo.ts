@@ -17,7 +17,7 @@ export interface ChatMessage {
 
 export async function getDb(): Promise<Db> {
   await client.connect();
-  return client.db("chatdb"); // Change to your DB name
+  return client.db("chatdb");
 }
 
 export async function insertChat(user: string, bot: string, userId: string) {

@@ -7,7 +7,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { user, bot } = await request.json();
   const userId = await getOrCreateUserId(request);
 
-  // Set cookie if not present
   const headers = new Headers();
   const cookieHeader = request.headers.get("Cookie");
   if (!cookieHeader || !cookieHeader.includes("user_id")) {

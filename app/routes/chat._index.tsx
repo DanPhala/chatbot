@@ -19,7 +19,6 @@ export default function ChatScreen() {
       .then(res => res.json())
       .then(data => {
         if (data.chats) {
-          // Flatten user and bot messages for display
           const loadedMessages: Message[] = [];
           data.chats.forEach((chat: any, idx: number) => {
             loadedMessages.push({
@@ -69,7 +68,6 @@ export default function ChatScreen() {
     });
     const data = await response.json();
 
-    // Save chat to MongoDB via API
     await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
