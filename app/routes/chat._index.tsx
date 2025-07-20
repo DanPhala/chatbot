@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback } from 'react';
+import {useEffect, useState, useCallback } from 'react';
 import ChatInputComponent from '../components/ui/textArea';
 import ChatTextField from '../components/common/chatTextField';
 import Header from '../components/ui/header';
@@ -40,8 +40,8 @@ export default function ChatScreen() {
       });
   }, []);
 
-  const handleSendMessage = useCallback(async (message: string, model: string, document?: string) => {
-  model = model || "gpt-4o-mini";
+  const handleSendMessage = useCallback(async (message: string, model: string) => {
+  model = model;
   setIsLoading(true);
 
   setMessages(prev => [
@@ -108,7 +108,7 @@ export default function ChatScreen() {
 
   return (
     <div className="flex flex-col h-screen">
-      <Header userName="John Doe" userEmail="john@example.com" /> {/* <-- Add Header here */}
+      <Header /> 
       <div className="flex-1 overflow-y-auto p-4">
         <div className="w-full max-w-6xl mx-auto">
           {messages.map((message) => (

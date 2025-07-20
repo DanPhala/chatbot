@@ -21,6 +21,13 @@
 
 ---
 
+## Environmental variables setup
+create a .env file in the root folder and add the following credentials for running the project locally
+```sh
+OPENAI_API_KEY=
+MODEL=
+MONGODB_URI=
+```
 ## 📖 Documentation
 
 - [Remix docs](https://remix.run/docs)
